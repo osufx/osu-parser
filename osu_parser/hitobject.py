@@ -1,7 +1,13 @@
 from osu_parser import mathhelper, curves
 
+class SliderTick(object):
+    def __init__(self, x, y, time):
+        self.x = x
+        self.y = y
+        self.time = time
+
 class HitObject(object):
-    def __init__(self, x, y, time, object_type, slider_type = None, curve_points = None, repeat = 1, pixel_length = 0, timing_point = None, difficulty = None):
+    def __init__(self, x, y, time, object_type, slider_type = None, curve_points = None, repeat = 1, pixel_length = 0, timing_point = None, tick_distance = 1):
         """
         HitObject params for normal hitobject and sliders
 
@@ -16,7 +22,7 @@ class HitObject(object):
         repeat -- amount of repeats for the slider (+1)
         pixel_length -- length of the slider
         timing_point -- ref of current timing point for the timestamp
-        difficulty -- ref of beatmap's difficulty
+        tick_distance -- distance betwin slider ticks
         """
         self.x = x
         self.y = y
@@ -32,7 +38,9 @@ class HitObject(object):
 
             #For slider tick calculations
             self.timing_point = timing_point
-            self.difficulty = difficulty
+            self.tick_distance = tick_distance * 1000
+
+            self.ticks = []
 
             self.calc_slider()
     
@@ -66,8 +74,18 @@ class HitObject(object):
         #Make end
         if not hasattr(self, 'end'):
             if self.slider_type == "L":     #Linear
+                i = self.tick_distance
+                while i < self.pixel_length:
+                    point = mathhelper.point_on_line(path[0], path[1], i)
+                    self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
+                    i += self.tick_distance
                 self.end = mathhelper.point_on_line(path[0], path[1], self.pixel_length)
             elif self.slider_type == "P":   #Perfect
+                i = self.tick_distance
+                while i < self.pixel_length:
+                    point = curve.point_at_distance(i)
+                    self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
+                    i += self.tick_distance
                 self.end = curve.point_at_distance(self.pixel_length)
             elif self.slider_type == "B":   #Bezier
                 self.end = curve.point_at_distance(self.pixel_length)

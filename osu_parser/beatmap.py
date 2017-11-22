@@ -11,6 +11,7 @@ class Beatmap(object):
         file_name -- Directory for beatmap file (.osu)
         """
         self.file_name = file_name
+        self.version = -1   #Unknown by default
         self.header = -1
         self.difficulty = {}
         self.timing_points = {
@@ -18,15 +19,18 @@ class Beatmap(object):
             "bpm": {},  #Beats pr minute
             "spm": {}   #Speed modifier
         }
+        self.slider_point_distance = 1  #Changes after [Difficulty] is fully parsed
         self.hitobjects = []
         self.parse_beatmap()
         #self.object_count = self.get_object_count()
+        print("Done: {}".format(len(self.hitobjects)))
     
     def parse_beatmap(self):
         """
         Parses beatmap file line by line by passing each line into parse_line.
         """
         with open(self.file_name) as file_stream:
+            self.version = int(''.join(list(filter(str.isdigit, file_stream.readline()))))  #Set version
             for line in file_stream:
                 self.parse_line(line.replace("\n", ""))
 
@@ -47,6 +51,7 @@ class Beatmap(object):
                 self.header = 1
             elif line == "[HitObjects]":
                 self.header = 2
+                self.slider_point_distance = (100 * self.difficulty["SliderMultiplier"]) / self.difficulty["SliderTickRate"]
             else:
                 self.header = -1
             return
@@ -100,13 +105,18 @@ class Beatmap(object):
         if 2 & object_type:  #Slider
             time_point = self.get_timing_point_all(time)
 
+            if self.version < 8:
+                tick_distance = self.slider_point_distance
+            else:
+                tick_distance = self.slider_point_distance / mathhelper.clamp(self.get_timing_point(time, "spm"), 10, 1000) / 100
+
             curve_split = split_object[5].split("|")
             curve_points = []
             for i in range(1, len(curve_split)):
                 vector_split = curve_split[i].split(":")
                 vector = mathhelper.Vec2(int(vector_split[0]), int(vector_split[1]))
                 curve_points.append(vector)
-            hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, curve_split[0], curve_points, int(split_object[6]), float(split_object[7]), time_point, self.difficulty)
+            hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, curve_split[0], curve_points, int(split_object[6]), float(split_object[7]), time_point, tick_distance)
         else:
             hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type)
 
