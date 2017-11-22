@@ -9,6 +9,8 @@ tur.penup()
 tur.speed(8)
 
 for hitobject in beatmap.hitobjects:
+    if hitobject.time < 57500:
+        continue
     print(hitobject.time)
     tur.goto(hitobject.x, -hitobject.y)
     tur.pendown()
@@ -26,6 +28,7 @@ for hitobject in beatmap.hitobjects:
         
         for tick in hitobject.ticks:
             tur.goto(tick.x, -tick.y)
+            print("time: {}, pos: {}".format(hitobject.time, "(X:{} Y:{})".format(tick.x, tick.y)))
             tur.dot(6, "black")
 
     else:

@@ -38,7 +38,7 @@ class HitObject(object):
 
             #For slider tick calculations
             self.timing_point = timing_point
-            self.tick_distance = tick_distance * 1000
+            self.tick_distance = tick_distance * self.timing_point["spm"] * 1000
 
             self.ticks = []
 
@@ -68,7 +68,7 @@ class HitObject(object):
             elif self.slider_type == "P":   #Perfect
                 self.path = []
                 l = 0
-                step = 0.5
+                step = 5
                 while l <= self.pixel_length:
                     self.path.append(curve.point_at_distance(l))
                     l += step
@@ -79,30 +79,38 @@ class HitObject(object):
             else:
                 raise Exception("Slidertype not supported! ({})".format(self.slider_type))
 
-        #End points and slider ticks
+        #End points
+        if self.slider_type == "L":     #Linear
+            self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], self.pixel_length)
+        elif self.slider_type == "P":   #Perfect
+            self.end = curve.point_at_distance(self.pixel_length)
+        elif self.slider_type == "B":   #Bezier
+            self.end = curve.point_at_distance(self.pixel_length)
+        elif self.slider_type == "C":   #Catmull
+            self.end = curve.point_at_distance(self.pixel_length)
+        else:
+            raise Exception("Slidertype not supported! ({})".format(self.slider_type))
+
+        print("bpm: {}".format(self.timing_point["bpm"]))
+
+        #Set slider ticks
         if self.slider_type == "L":     #Linear
             while current_distance < self.pixel_length:
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
                 self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                 current_distance += self.tick_distance
-            self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], self.pixel_length)
         elif self.slider_type == "P":   #Perfect
             while current_distance < self.pixel_length:
                 point = curve.point_at_distance(current_distance)
                 self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                 current_distance += self.tick_distance
-            self.end = curve.point_at_distance(self.pixel_length)
         elif self.slider_type == "B":   #Bezier
             while current_distance < self.pixel_length:
                 point = curve.point_at_distance(current_distance)
                 self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                 current_distance += self.tick_distance
-            self.end = curve.point_at_distance(self.pixel_length)
         elif self.slider_type == "C":   #Catmull
             while current_distance < self.pixel_length:
                 point = curve.point_at_distance(current_distance)
                 self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                 current_distance += self.tick_distance
-            self.end = curve.point_at_distance(self.pixel_length)
-        else:
-            raise Exception("Slidertype not supported! ({})".format(self.slider_type))

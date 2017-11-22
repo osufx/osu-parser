@@ -56,6 +56,7 @@ def cart_from_pol(r, t):
 def point_at_distance(array, distance, return_extra = False): #TODO: Optimize...
     i = 0
     current_distance = 0
+    new_distance = 0
 
     if len(array) < 2:
         if return_extra:
