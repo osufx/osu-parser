@@ -73,29 +73,32 @@ class HitObject(object):
 
         #Make end
         if not hasattr(self, 'end'):
+            i = self.tick_distance
             if self.slider_type == "L":     #Linear
-                i = self.tick_distance
                 while i < self.pixel_length:
                     point = mathhelper.point_on_line(path[0], path[1], i)
                     self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                     i += self.tick_distance
                 self.end = mathhelper.point_on_line(path[0], path[1], self.pixel_length)
             elif self.slider_type == "P":   #Perfect
-                i = self.tick_distance
                 while i < self.pixel_length:
                     point = curve.point_at_distance(i)
                     self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                     i += self.tick_distance
                 self.end = curve.point_at_distance(self.pixel_length)
             elif self.slider_type == "B":   #Bezier
+                while i < self.pixel_length:
+                    point = curve.point_at_distance(i)
+                    self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
+                    i += self.tick_distance
                 self.end = curve.point_at_distance(self.pixel_length)
             elif self.slider_type == "C":   #Catmull
+                while i < self.pixel_length:
+                    point = curve.point_at_distance(i)
+                    self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
+                    i += self.tick_distance
                 self.end = curve.point_at_distance(self.pixel_length)
             else:
                 raise Exception("Slidertype not supported! ({})".format(self.slider_type))
 
         self.path = path
-
-        #Place slider_ticks
-
-        #Place end_point
