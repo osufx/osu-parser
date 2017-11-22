@@ -6,10 +6,12 @@ beatmap = Beatmap("test.osu")
 wn = turtle.Screen()
 tur = turtle.Turtle()
 tur.penup()
-tur.speed(4)
+tur.speed(8)
 
 for hitobject in beatmap.hitobjects:
     print(hitobject.time)
+    if hitobject.time != 26125:
+        continue
     tur.goto(hitobject.x, -hitobject.y)
     tur.pendown()
     tur.pencolor("red")
@@ -17,6 +19,7 @@ for hitobject in beatmap.hitobjects:
         tur.dot(6)
         for point in hitobject.path:
             tur.goto(point.x, -point.y)
+        print(hitobject.end)
         tur.goto(hitobject.end.x, -hitobject.end.y)
         tur.pencolor("green")
         tur.dot(6)

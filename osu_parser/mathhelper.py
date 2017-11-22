@@ -103,9 +103,9 @@ def point_at_distance(array, distance, return_extra = False): #TODO: Optimize...
         cart = cart_from_pol((distance - current_distance), angle)
 
         if array[i].x > array[i + 1].x:
-            coord = [(array[i].x - cart.x), (array[i].y - cart.y)]
+            coord = Vec2((array[i].x - cart.x), (array[i].y - cart.y))
         else:
-            coord = [(array[i].x + cart.y), (array[i].y + cart.y)]
+            coord = Vec2((array[i].x + cart.y), (array[i].y + cart.y))
     
     if return_extra:
         return [coord, angle, i]
@@ -116,6 +116,9 @@ class Vec2(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
     def distance(self, other):
         x = self.x - other.x

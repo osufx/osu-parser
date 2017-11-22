@@ -18,12 +18,16 @@ class Bezier(object):
             raise Exception("Bezier was calculated twice!")
 
         sub_points = []
-        for point in self.points:
-            if len(sub_points) >= 2 and point.x == sub_points[-1].x and point.y == sub_points[-1].y:
+        for i in range(len(self.points)):
+            if i == len(self.points) - 1:
+                sub_points.append(self.points[i])
                 self.bezier(sub_points)
                 sub_points.clear()
-
-            sub_points.append(point)
+            elif len(sub_points) > 1 and self.points[i] == sub_points[-1]:
+                self.bezier(sub_points)
+                sub_points.clear()
+            
+            sub_points.append(self.points[i])
 
     def bezier(self, points):
         order = len(points)
