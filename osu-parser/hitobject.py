@@ -27,6 +27,8 @@ class HitObject(object):
             self.curve_points = curve_points
             self.repeat = repeat
             self.pixel_length = pixel_length
+
+            #For slider tick calculations
             self.timing_point = timing_point
             self.difficulty = difficulty
 
