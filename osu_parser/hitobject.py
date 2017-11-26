@@ -1,3 +1,4 @@
+import math
 from osu_parser import mathhelper, curves
 
 class SliderTick(object):
@@ -7,7 +8,7 @@ class SliderTick(object):
         self.time = time
 
 class HitObject(object):
-    def __init__(self, x, y, time, object_type, slider_type = None, curve_points = None, repeat = 1, pixel_length = 0, timing_point = None, tick_distance = 1):
+    def __init__(self, x, y, time, object_type, slider_type = None, curve_points = None, repeat = 1, pixel_length = 0, timing_point = None, px_per_beat = 1, difficulty = None, tick_distance = 1):
         """
         HitObject params for normal hitobject and sliders
 
@@ -22,7 +23,7 @@ class HitObject(object):
         repeat -- amount of repeats for the slider (+1)
         pixel_length -- length of the slider
         timing_point -- ref of current timing point for the timestamp
-        tick_distance -- distance betwin slider ticks
+        px_per_beat -- pixels per. beat
         """
         self.x = x
         self.y = y
@@ -38,14 +39,17 @@ class HitObject(object):
 
             #For slider tick calculations
             self.timing_point = timing_point
-            self.tick_distance = tick_distance * self.timing_point["spm"] * 1000
+            self.px_per_beat = px_per_beat
+            self.difficulty = difficulty
+            self.tick_distance = tick_distance
 
             self.ticks = []
 
             self.calc_slider(True)
     
     def calc_slider(self, calc_path = False):
-        current_distance = self.tick_distance
+        num_beats = (self.pixel_length * self.repeat) / self.px_per_beat
+        self.duration = math.ceil(num_beats * self.timing_point["mpb"])
 
         #Fix broken objects
         if self.slider_type == "P" and len(self.curve_points) > 3:
@@ -79,6 +83,9 @@ class HitObject(object):
             else:
                 raise Exception("Slidertype not supported! ({})".format(self.slider_type))
 
+        #End time
+        self.end_time = self.time + self.duration
+
         #End points
         if self.slider_type == "L":     #Linear
             self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], self.pixel_length)
@@ -90,10 +97,38 @@ class HitObject(object):
             self.end = curve.point_at_distance(self.pixel_length)
         else:
             raise Exception("Slidertype not supported! ({})".format(self.slider_type))
+        
+        #Put end time on end point
+        self.end = SliderTick(self.end.x, self.end.y, self.end_time)
 
-        print("bpm: {}".format(self.timing_point["bpm"]))
+        #Quick calc how many ticks
+        self.object_count = (math.ceil((num_beats - 0.1) / self.repeat * self.difficulty["SliderTickRate"]) - 1) * self.repeat + self.repeat + 1
 
         #Set slider ticks
+        #tick_distance = (self.timing_point["spm"] * self.timing_point["mpb"]) / self.px_per_beat
+        #tick_distance = (100 * self.difficulty["SliderMultiplier"]) / self.difficulty["SliderTickRate"]
+
+        
+
+        print("spm: {}, mpb: {}, px_per_beat: {}, tick_distance: {}".format(self.timing_point["spm"], self.timing_point["mpb"], self.px_per_beat, self.tick_distance))
+        current_distance = self.tick_distance
+        time_add = self.duration / self.object_count
+        while current_distance < self.pixel_length:
+            if self.slider_type == "L":     #Linear
+                point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
+            else:   #Perfect, Bezier & Catmull uses the same function
+                point = curve.point_at_distance(current_distance)
+            self.ticks.append(SliderTick(point.x, point.y, self.time + time_add * (len(self.ticks) + 1)))
+            current_distance += self.tick_distance
+
+        """
+        current_time = self.time + self.px_per_beat
+        while current_time < self.end_time:
+            dist = 
+            current_time += self.px_per_beat
+        """
+            
+        """
         if self.slider_type == "L":     #Linear
             while current_distance < self.pixel_length:
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
@@ -114,3 +149,4 @@ class HitObject(object):
                 point = curve.point_at_distance(current_distance)
                 self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
                 current_distance += self.tick_distance
+        """

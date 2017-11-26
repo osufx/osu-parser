@@ -84,9 +84,10 @@ class Beatmap(object):
 
         if timing_point_focus.startswith("-"):  #If not then its not a slider velocity modifier
             self.timing_points["spm"][timing_point_time] = -100 / float(timing_point_focus) #Convert to normalized value and store
+            self.timing_points["mpb"][timing_point_time] = float(timing_point_focus)
         else:
             self.timing_points["bpm"][timing_point_time] = 60000 / float(timing_point_focus)#^
-            self.timing_points["mpb"][timing_point_time] = float(timing_point_focus)        #We use this value to modify slider velocity_red
+            #self.timing_points["mpb"][timing_point_time] = float(timing_point_focus)
 
     def handle_hitobject(self, line):
         """
@@ -103,12 +104,40 @@ class Beatmap(object):
             return
 
         if 2 & object_type:  #Slider
+            repeat = int(split_object[6])
+            pixel_length = float(split_object[7])
+
             time_point = self.get_timing_point_all(time)
 
-            if self.version < 8:
-                tick_distance = self.slider_point_distance
-            else:
-                tick_distance = self.slider_point_distance / mathhelper.clamp(self.get_timing_point(time, "spm"), 10, 1000) / 100
+            px_per_beat = self.difficulty["SliderTickRate"] * 100
+
+            if self.version >= 8:
+                px_per_beat *= time_point["spm"]
+            
+            #num_beats = (pixel_length * repeat) / px_per_beat
+
+            """
+            slider_velocity_multiplier = time_point["spm"]
+            beat_len = time_point["mpb"] / slider_velocity_multiplier
+            velocity = 100 * self.difficulty["SliderTickRate"] / beat_len
+            duration = pixel_length * repeat / velocity
+
+            if self.version >= 8:
+                beat_len *= slider_velocity_multiplier
+
+            tick_distance = min(
+                beat_len / self.difficulty["SliderTickRate"],
+                duration / repeat
+                )
+            """
+
+            tick_distance = (100 * self.difficulty["SliderMultiplier"]) / self.difficulty["SliderTickRate"]
+            print("tick_distance: {}".format(tick_distance))
+            if self.version >= 8:
+                print("mpb: {}".format(time_point["mpb"]))
+                tick_distance /= mathhelper.clamp(-time_point["mpb"], 10, 1000) / 100
+                #tick_distance *= time_point["spm"]
+                print("AFTER tick_distance: {}".format(tick_distance))
 
             curve_split = split_object[5].split("|")
             curve_points = []
@@ -116,7 +145,7 @@ class Beatmap(object):
                 vector_split = curve_split[i].split(":")
                 vector = mathhelper.Vec2(int(vector_split[0]), int(vector_split[1]))
                 curve_points.append(vector)
-            hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, curve_split[0], curve_points, int(split_object[6]), float(split_object[7]), time_point, tick_distance)
+            hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, curve_split[0], curve_points, repeat, pixel_length, time_point, px_per_beat, self.difficulty, tick_distance)
         else:
             hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type)
 
@@ -130,13 +159,13 @@ class Beatmap(object):
         return -- {"mpb": Float, "bpm": Float, "spm": Float}
         """
         types = {
-            "mpb": 100,
+            "mpb": -100,
             "bpm": 100,
             "spm": 1
         }   #Will return the default value if timing point were not found
         for t in types.keys():
             r = self.get_timing_point(time, t)
-            if r > 0:
+            if r != None:
                 types[t] = r
             else:
                 print("{} were not found for timestamp {}, using {} instead.".format(t, time, types[t]))
@@ -151,12 +180,15 @@ class Beatmap(object):
         timing_type -- mpb, bmp or spm
         return -- self.timing_points object
         """
-        r = -1
-        for key in self.timing_points[timing_type].keys():
-            if key <= time:
-                r = self.timing_points[timing_type][key]
-            else:
-                break
+        r = None
+        try:
+            for key in self.timing_points[timing_type].keys():
+                if key <= time:
+                    r = self.timing_points[timing_type][key]
+                else:
+                    break
+        except Exception as e:
+            print(e)
         return r
 
     def get_object_count(self):
