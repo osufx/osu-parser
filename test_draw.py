@@ -9,8 +9,8 @@ tur.penup()
 tur.speed(8)
 
 for hitobject in beatmap.hitobjects:
-    #if hitobject.time < 37500 or hitobject.time > 40800:
-        #continue
+    if hitobject.time < 36300 or hitobject.time > 37600:
+        continue
     print(hitobject.time)
     tur.goto(hitobject.x, -hitobject.y)
     tur.pendown()

@@ -113,7 +113,7 @@ class HitObject(object):
         print("spm: {}, mpb: {}, px_per_beat: {}, tick_distance: {}".format(self.timing_point["spm"], self.timing_point["mpb"], self.px_per_beat, self.tick_distance))
         current_distance = self.tick_distance
         time_add = self.duration / self.object_count
-        while current_distance < self.pixel_length:
+        while current_distance < self.pixel_length - 1:
             if self.slider_type == "L":     #Linear
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
             else:   #Perfect, Bezier & Catmull uses the same function
