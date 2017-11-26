@@ -22,6 +22,7 @@ class Beatmap(object):
         }
         self.slider_point_distance = 1  #Changes after [Difficulty] is fully parsed
         self.hitobjects = []
+        self.max_combo = 0
         self.parse_beatmap()
         print("Beatmap parsed!")
     
@@ -124,6 +125,7 @@ class Beatmap(object):
             hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type)
 
         self.hitobjects.append(hitobject)
+        self.max_combo += hitobject.get_combo()
 
     def get_timing_point_all(self, time):
         """

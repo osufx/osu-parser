@@ -109,3 +109,18 @@ class HitObject(object):
                 point = curve.point_at_distance(current_distance)
             self.ticks.append(SliderTick(point.x, point.y, self.time + time_add * (len(self.ticks) + 1)))
             current_distance += self.tick_distance
+
+    def get_combo(self):
+        """
+        Returns the combo given by this object
+        1 if normal hitobject, 2+ if slider (adds sliderticks)
+        """
+        if 2 & self.type:   #Slider
+            val = 2                     #There is always a start and an end hitobject on every slider
+            val += len(self.ticks)      #The amount of sliderticks
+            val *= self.repeat          #Reverse slider
+            val -= (self.repeat - 1)    #Remove the reversearrow hitobject so it doesnt count reverse points twice
+        else:   #Normal
+            val = 1                     #Itself...
+        
+        return val
