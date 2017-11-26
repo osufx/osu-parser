@@ -26,8 +26,11 @@ for hitobject in beatmap.hitobjects:
 
         tur.penup()
         
+        i = 0
         for tick in hitobject.ticks:
             tur.goto(tick.x, -tick.y)
+            print("id: {}, time: {}".format(i, tick.time))
+            i += 1
             #print("time: {}, pos: {}".format(hitobject.time, "(X:{} Y:{})".format(tick.x, tick.y)))
             tur.dot(6, "black")
 
