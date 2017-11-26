@@ -48,8 +48,9 @@ class HitObject(object):
             self.calc_slider(True)
     
     def calc_slider(self, calc_path = False):
+        #Calculate slider duration
         num_beats = (self.pixel_length * self.repeat) / self.px_per_beat
-        self.duration = math.ceil(num_beats * self.timing_point["mpb"])
+        self.duration = math.ceil(num_beats * -self.timing_point["mpb"]) * (self.timing_point["bpm"] / 100)
 
         #Fix broken objects
         if self.slider_type == "P" and len(self.curve_points) > 3:
@@ -101,18 +102,9 @@ class HitObject(object):
         #Put end time on end point
         self.end = SliderTick(self.end.x, self.end.y, self.end_time)
 
-        #Quick calc how many ticks
-        self.object_count = (math.ceil((num_beats - 0.1) / self.repeat * self.difficulty["SliderTickRate"]) - 1) * self.repeat + self.repeat + 1
-
         #Set slider ticks
-        #tick_distance = (self.timing_point["spm"] * self.timing_point["mpb"]) / self.px_per_beat
-        #tick_distance = (100 * self.difficulty["SliderMultiplier"]) / self.difficulty["SliderTickRate"]
-
-        
-
-        print("spm: {}, mpb: {}, px_per_beat: {}, tick_distance: {}".format(self.timing_point["spm"], self.timing_point["mpb"], self.px_per_beat, self.tick_distance))
         current_distance = self.tick_distance
-        time_add = self.duration / self.object_count
+        time_add = self.duration * (self.tick_distance / self.pixel_length)
         while current_distance < self.pixel_length - 1:
             if self.slider_type == "L":     #Linear
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
@@ -120,33 +112,3 @@ class HitObject(object):
                 point = curve.point_at_distance(current_distance)
             self.ticks.append(SliderTick(point.x, point.y, self.time + time_add * (len(self.ticks) + 1)))
             current_distance += self.tick_distance
-
-        """
-        current_time = self.time + self.px_per_beat
-        while current_time < self.end_time:
-            dist = 
-            current_time += self.px_per_beat
-        """
-            
-        """
-        if self.slider_type == "L":     #Linear
-            while current_distance < self.pixel_length:
-                point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
-                self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
-                current_distance += self.tick_distance
-        elif self.slider_type == "P":   #Perfect
-            while current_distance < self.pixel_length:
-                point = curve.point_at_distance(current_distance)
-                self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
-                current_distance += self.tick_distance
-        elif self.slider_type == "B":   #Bezier
-            while current_distance < self.pixel_length:
-                point = curve.point_at_distance(current_distance)
-                self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
-                current_distance += self.tick_distance
-        elif self.slider_type == "C":   #Catmull
-            while current_distance < self.pixel_length:
-                point = curve.point_at_distance(current_distance)
-                self.ticks.append(SliderTick(point.x, point.y, self.time+1))#TODO: Fix time
-                current_distance += self.tick_distance
-        """

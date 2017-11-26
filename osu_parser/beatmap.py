@@ -22,8 +22,7 @@ class Beatmap(object):
         self.slider_point_distance = 1  #Changes after [Difficulty] is fully parsed
         self.hitobjects = []
         self.parse_beatmap()
-        #self.object_count = self.get_object_count()
-        print("Done: {}".format(len(self.hitobjects)))
+        print("Beatmap parsed!")
     
     def parse_beatmap(self):
         """
@@ -113,31 +112,10 @@ class Beatmap(object):
 
             if self.version >= 8:
                 px_per_beat *= time_point["spm"]
-            
-            #num_beats = (pixel_length * repeat) / px_per_beat
-
-            """
-            slider_velocity_multiplier = time_point["spm"]
-            beat_len = time_point["mpb"] / slider_velocity_multiplier
-            velocity = 100 * self.difficulty["SliderTickRate"] / beat_len
-            duration = pixel_length * repeat / velocity
-
-            if self.version >= 8:
-                beat_len *= slider_velocity_multiplier
-
-            tick_distance = min(
-                beat_len / self.difficulty["SliderTickRate"],
-                duration / repeat
-                )
-            """
 
             tick_distance = (100 * self.difficulty["SliderMultiplier"]) / self.difficulty["SliderTickRate"]
-            print("tick_distance: {}".format(tick_distance))
             if self.version >= 8:
-                print("mpb: {}".format(time_point["mpb"]))
                 tick_distance /= mathhelper.clamp(-time_point["mpb"], 10, 1000) / 100
-                #tick_distance *= time_point["spm"]
-                print("AFTER tick_distance: {}".format(tick_distance))
 
             curve_split = split_object[5].split("|")
             curve_points = []
@@ -167,8 +145,8 @@ class Beatmap(object):
             r = self.get_timing_point(time, t)
             if r != None:
                 types[t] = r
-            else:
-                print("{} were not found for timestamp {}, using {} instead.".format(t, time, types[t]))
+            #else:
+                #print("{} were not found for timestamp {}, using {} instead.".format(t, time, types[t]))
 
         return types
 

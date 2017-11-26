@@ -19,7 +19,7 @@ for hitobject in beatmap.hitobjects:
         tur.dot(6)
         for point in hitobject.path:
             tur.goto(point.x, -point.y)
-        print(hitobject.end)
+        print("start: {}, end: {}, duration: {}".format(hitobject.time, hitobject.end_time, hitobject.duration))
         tur.goto(hitobject.end.x, -hitobject.end.y)
         tur.pencolor("green")
         tur.dot(6)
@@ -28,7 +28,7 @@ for hitobject in beatmap.hitobjects:
         
         for tick in hitobject.ticks:
             tur.goto(tick.x, -tick.y)
-            print("time: {}, pos: {}".format(hitobject.time, "(X:{} Y:{})".format(tick.x, tick.y)))
+            #print("time: {}, pos: {}".format(hitobject.time, "(X:{} Y:{})".format(tick.x, tick.y)))
             tur.dot(6, "black")
 
     else:
