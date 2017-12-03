@@ -1,4 +1,5 @@
 import math
+import copy
 from osu_parser import mathhelper, curves
 
 class SliderTick(object):
@@ -42,11 +43,12 @@ class HitObject(object):
             self.timing_point = timing_point
             self.difficulty = difficulty
             self.tick_distance = tick_distance
-            self.duration = self.timing_point["raw_bpm"] * (pixel_length / (self.difficulty["SliderMultiplier"] * self.timing_point["spm"])) / 100
+            self.duration = (self.timing_point["raw_bpm"] * (pixel_length / (self.difficulty["SliderMultiplier"] * self.timing_point["spm"])) / 100) * self.repeat
 
             self.ticks = []
+            self.end_ticks = []
 
-            self.calc_slider(True)
+            self.calc_slider()
     
     def calc_slider(self, calc_path = False):
         #Fix broken objects
@@ -84,15 +86,19 @@ class HitObject(object):
         #End time
         self.end_time = self.time + self.duration
 
+        end_length = self.pixel_length
+        if 1 & self.repeat == 0:
+            end_length = 0
+
         #End points
         if self.slider_type == "L":     #Linear
-            self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], self.pixel_length)
+            self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], end_length)
         elif self.slider_type == "P":   #Perfect
-            self.end = curve.point_at_distance(self.pixel_length)
+            self.end = curve.point_at_distance(end_length)
         elif self.slider_type == "B":   #Bezier
-            self.end = curve.point_at_distance(self.pixel_length)
+            self.end = curve.point_at_distance(end_length)
         elif self.slider_type == "C":   #Catmull
-            self.end = curve.point_at_distance(self.pixel_length)
+            self.end = curve.point_at_distance(end_length)
         else:
             raise Exception("Slidertype not supported! ({})".format(self.slider_type))
         
@@ -101,14 +107,49 @@ class HitObject(object):
 
         #Set slider ticks
         current_distance = self.tick_distance
-        time_add = self.duration * (self.tick_distance / self.pixel_length)
-        while current_distance < self.pixel_length - 1:
+        time_add = self.duration * (self.tick_distance / (self.pixel_length * self.repeat))
+
+        while current_distance < self.pixel_length:
             if self.slider_type == "L":     #Linear
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
             else:   #Perfect, Bezier & Catmull uses the same function
                 point = curve.point_at_distance(current_distance)
+
             self.ticks.append(SliderTick(point.x, point.y, self.time + time_add * (len(self.ticks) + 1)))
             current_distance += self.tick_distance
+        
+        #Adds slider_ends / repeat_points
+        repeat_id = 1
+        repeat_bonus_ticks = []
+        while repeat_id < self.repeat:
+            dist = (1 & repeat_id) * self.pixel_length
+            time_offset = (self.duration / self.repeat) * repeat_id
+
+            if self.slider_type == "L":     #Linear
+                point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], dist)
+            else:   #Perfect, Bezier & Catmull uses the same function
+                point = curve.point_at_distance(dist)
+
+            self.end_ticks.append(SliderTick(point.x, point.y, self.time + time_offset))
+
+            #Adds the ticks that already exists on the slider back (but reversed)
+            repeat_ticks = copy.deepcopy(self.ticks)
+
+            if 1 & repeat_id: #We have to reverse the timing normalizer
+                #repeat_ticks = list(reversed(repeat_ticks))
+                normalize_time_value = self.time + (self.duration / self.repeat)
+            else:
+                normalize_time_value = self.time
+
+            #Correct timing
+            for tick in repeat_ticks:
+                tick.time = self.time + time_offset + abs(tick.time - normalize_time_value)
+
+            repeat_bonus_ticks += repeat_ticks
+
+            repeat_id += 1
+
+        self.ticks += repeat_bonus_ticks
 
     def get_combo(self):
         """
@@ -116,10 +157,9 @@ class HitObject(object):
         1 if normal hitobject, 2+ if slider (adds sliderticks)
         """
         if 2 & self.type:   #Slider
-            val = 2                     #There is always a start and an end hitobject on every slider
+            val = 1                     #Start of the slider
             val += len(self.ticks)      #The amount of sliderticks
-            val *= self.repeat          #Reverse slider
-            val -= (self.repeat - 1)    #Remove the reversearrow hitobject so it doesnt count reverse points twice
+            val += self.repeat          #Reverse slider
         else:   #Normal
             val = 1                     #Itself...
         
