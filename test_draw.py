@@ -2,7 +2,7 @@ import turtle
 import time
 from osu_parser.beatmap import Beatmap
 
-beatmap = Beatmap("reanimate.osu")
+beatmap = Beatmap("DEBUG.osu")
 
 wn = turtle.Screen()
 tur = turtle.Turtle()
@@ -26,7 +26,7 @@ for hitobject in beatmap.hitobjects:
         for tick in hitobject.ticks:
             tur.goto(tick.x, -tick.y)
             print("time: {}, x: {}, y: {}, type: tick, num: {}".format(tick.time, tick.x, tick.y, i))
-            time.sleep(0.5)
+            time.sleep(1.5)
             i += 1
             tur.dot(6, "black")
 
@@ -34,14 +34,9 @@ for hitobject in beatmap.hitobjects:
         for end_tick in hitobject.end_ticks:
             tur.goto(end_tick.x, -end_tick.y)
             print("time: {}, x: {}, y: {}, type: end_tick, num: {}".format(end_tick.time, end_tick.x, end_tick.y, i))
-            time.sleep(0.5)
+            time.sleep(1.5)
             i += 1
             tur.dot(6, "gray")
-        
-        tur.goto(hitobject.end.x, -hitobject.end.y)
-        print("time: {}, x: {}, y: {}, type: sliderEnd".format(hitobject.end.time, hitobject.end.x, hitobject.end.y))
-        tur.pencolor("green")
-        tur.dot(6)
     else:
         tur.pencolor("blue")
         tur.dot(6)

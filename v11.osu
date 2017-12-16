@@ -1,4 +1,4 @@
-osu file format v14
+osu file format v11
 
 [General]
 AudioFilename: audio.mp3
@@ -9,7 +9,7 @@ SampleSet: Soft
 StackLeniency: 0.7
 Mode: 2
 LetterboxInBreaks: 0
-WidescreenStoryboard: 0
+WidescreenStoryboard: 1
 
 [Editor]
 Bookmarks: 30862,238392
@@ -24,17 +24,17 @@ TitleUnicode:B.B.K.K.B.K.K. (Extended Mix)
 Artist:nora2r
 ArtistUnicode:nora2r
 Creator:CLSW
-Version:C.C.C.C.C.C.C.
+Version:v11
 Source:BMS
 Tags:c86 bof 2013 YATSUZAKI HARDCORE VOLUME 4 fooRider Notebook Records maimai CHUNITHM sdvx
-BeatmapID:1162294
+BeatmapID:0
 BeatmapSetID:548873
 
 [Difficulty]
-HPDrainRate:6.4
-CircleSize:4.5
-OverallDifficulty:9.4
-ApproachRate:9.4
+HPDrainRate:6
+CircleSize:5
+OverallDifficulty:9
+ApproachRate:9
 SliderMultiplier:3.2
 SliderTickRate:2
 
