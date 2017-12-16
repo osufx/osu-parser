@@ -1,5 +1,5 @@
 from osu_parser.beatmap import Beatmap
 
-beatmap = Beatmap("test.osu")
+beatmap = Beatmap("reanimate.osu")
 
-print("hit_object_count: {}".format(len(beatmap.hitobjects)))
+print("hit_object_count: {}, max_combo: {}".format(len(beatmap.hitobjects), beatmap.max_combo))

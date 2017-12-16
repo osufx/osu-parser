@@ -83,28 +83,6 @@ class HitObject(object):
             else:
                 raise Exception("Slidertype not supported! ({})".format(self.slider_type))
 
-        #End time
-        self.end_time = self.time + self.duration
-
-        end_length = self.pixel_length
-        if 1 & self.repeat == 0:
-            end_length = 0
-
-        #End points
-        if self.slider_type == "L":     #Linear
-            self.end = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], end_length)
-        elif self.slider_type == "P":   #Perfect
-            self.end = curve.point_at_distance(end_length)
-        elif self.slider_type == "B":   #Bezier
-            self.end = curve.point_at_distance(end_length)
-        elif self.slider_type == "C":   #Catmull
-            self.end = curve.point_at_distance(end_length)
-        else:
-            raise Exception("Slidertype not supported! ({})".format(self.slider_type))
-        
-        #Put end time on end point
-        self.end = SliderTick(self.end.x, self.end.y, self.end_time)
-
         #Set slider ticks
         current_distance = self.tick_distance
         time_add = self.duration * (self.tick_distance / (self.pixel_length * self.repeat))

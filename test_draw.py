@@ -2,16 +2,16 @@ import turtle
 import time
 from osu_parser.beatmap import Beatmap
 
-beatmap = Beatmap("test.osu")
+beatmap = Beatmap("reanimate.osu")
 
 wn = turtle.Screen()
 tur = turtle.Turtle()
 tur.penup()
-tur.speed(2)
+tur.speed(1)
 
 for hitobject in beatmap.hitobjects:
-    if hitobject.time < 8000:
-        continue
+    #if hitobject.time < 8000:
+        #continue
     tur.goto(hitobject.x, -hitobject.y)
     tur.pendown()
     tur.pencolor("red")
