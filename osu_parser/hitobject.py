@@ -87,7 +87,7 @@ class HitObject(object):
         current_distance = self.tick_distance
         time_add = self.duration * (self.tick_distance / (self.pixel_length * self.repeat))
 
-        while current_distance < self.pixel_length:
+        while current_distance < self.pixel_length - self.tick_distance / 8:
             if self.slider_type == "L":     #Linear
                 point = mathhelper.point_on_line(self.curve_points[0], self.curve_points[1], current_distance)
             else:   #Perfect, Bezier & Catmull uses the same function
