@@ -2,6 +2,10 @@ import turtle
 import time
 from osu_parser.beatmap import Beatmap
 
+"""
+Old file used to debug and check if stuff was working.
+"""
+
 beatmap = Beatmap("DEBUG.osu")
 
 wn = turtle.Screen()
