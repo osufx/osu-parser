@@ -43,7 +43,7 @@ class HitObject(object):
             self.timing_point = timing_point
             self.difficulty = difficulty
             self.tick_distance = tick_distance
-            self.duration = (self.timing_point["raw_bpm"] * (pixel_length / (self.difficulty["SliderMultiplier"] * self.timing_point["spm"])) / 100) * self.repeat
+            self.duration = ((int(self.timing_point["raw_bpm"])/2) * (pixel_length / (self.difficulty["SliderMultiplier"] * self.timing_point["spm"])) / 100) * self.repeat
 
             self.ticks = []
             self.end_ticks = []

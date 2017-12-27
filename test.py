@@ -1,6 +1,6 @@
 from osu_parser.beatmap import Beatmap
 
-"""
+
 beatmap = Beatmap("slider_types.osu")
 print("[slider_types] hit_object_count: {}, max_combo: {}".format(len(beatmap.hitobjects), beatmap.max_combo))
 
@@ -15,7 +15,7 @@ print("[v14_2] hit_object_count: {}, max_combo: {}".format(len(beatmap.hitobject
 
 beatmap = Beatmap("v11_2.osu")
 print("[v11_2] hit_object_count: {}, max_combo: {}".format(len(beatmap.hitobjects), beatmap.max_combo))
-"""
+
 
 beatmap = Beatmap("DEBUG.osu")
 print("[DEBUG] hit_object_count: {}, max_combo: {}".format(len(beatmap.hitobjects), beatmap.max_combo))

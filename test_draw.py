@@ -5,10 +5,11 @@ from osu_parser.beatmap import Beatmap
 beatmap = Beatmap("DEBUG.osu")
 
 wn = turtle.Screen()
+wn.setup(width=0.65, height=0.9, startx=1920, starty=60)
 tur = turtle.Turtle()
 tur.penup()
 tur.speed(1)
-
+print(beatmap.difficulty)
 for hitobject in beatmap.hitobjects:
     #if hitobject.time < 8000:
         #continue
@@ -16,6 +17,7 @@ for hitobject in beatmap.hitobjects:
     tur.pendown()
     tur.pencolor("red")
     if 2 & hitobject.type:
+        print(hitobject.timing_point)
         tur.dot(6)
         #for point in hitobject.path:
             #tur.goto(point.x, -point.y)
