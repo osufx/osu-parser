@@ -99,7 +99,7 @@ class HitObject(object):
 
             self.ticks.append(SliderTick(point.x, point.y, self.time + time_add * (len(self.ticks) + 1)))
             current_distance += self.tick_distance
-        
+
         #Adds slider_ends / repeat_points
         repeat_id = 1
         repeat_bonus_ticks = []
