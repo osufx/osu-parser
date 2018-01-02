@@ -9,7 +9,7 @@ Old file used to debug and check if stuff was working.
 beatmap = Beatmap("DEBUG.osu")
 
 wn = turtle.Screen()
-wn.setup(width=0.65, height=0.9, startx=1920, starty=60)
+#wn.setup(width=0.65, height=0.9, startx=1920, starty=60)
 tur = turtle.Turtle()
 tur.penup()
 tur.speed(1)

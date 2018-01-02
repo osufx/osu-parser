@@ -28,7 +28,7 @@ class Beatmap(object):
         if "ApproachRate" not in self.difficulty.keys():    #Fix old osu version
             self.difficulty["ApproachRate"] = self.difficulty["OverallDifficulty"]
 
-        print("Beatmap parsed!")
+        #print("Beatmap parsed!")
     
     def parse_beatmap(self):
         """
@@ -84,9 +84,12 @@ class Beatmap(object):
         and store them into self.timing_points dict.
         """
         timing_point_split = timing_point.split(",")
-        timing_point_time = int(timing_point_split[0])
+        timing_point_time = int(float(timing_point_split[0])) #Fixes some special mappers special needs to use floats
         timing_point_focus = timing_point_split[1]
-        timing_point_type = int(timing_point_split[6])
+        
+        timing_point_type = 1
+        if len(timing_point_split) >= 7: #Fix for old beatmaps that only stores bpm change and timestamp (only BPM change) [v3?]
+            timing_point_type = int(timing_point_split[6])
 
         if timing_point_type == 0 and not timing_point_focus.startswith("-"):
             timing_point_focus = "-100"
@@ -149,7 +152,10 @@ class Beatmap(object):
                         del curve_points[0]
                         slider_type = "L"
 
-            hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, slider_type, curve_points, repeat, pixel_length, time_point, self.difficulty, tick_distance)
+            if len(curve_points) == 0: #Incase of ExGon meme (Sliders that acts like hitcircles)
+                hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, 1)
+            else:
+                hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type, slider_type, curve_points, repeat, pixel_length, time_point, self.difficulty, tick_distance)
         else:
             hitobject = HitObject(int(split_object[0]), int(split_object[1]), time, object_type)
 
